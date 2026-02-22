@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Municipal Waste Classification</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    /* Navigation */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #2c3e50 !important;
+    }
+    
+    .navbar-nav .nav-link {
+      color: #2c3e50 !important;
+      font-weight: 500;
+      margin: 0 1rem;
+      transition: color 0.3s ease;
+    }
+    
+    .navbar-nav .nav-link:hover {
+      color: #3498db !important;
+    }
+    
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                  url('https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+    }
+    
+    .hero-content {
+      max-width: 900px;
+      padding: 2rem;
+    }
+    
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+      opacity: 0.95;
+    }
+    
+    .btn-hero {
+      background: transparent;
+      border: 2px solid white;
+      color: white;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 0;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-hero:hover {
+      background: white;
+      color: #2c3e50;
+      transform: translateY(-2px);
+    }
+    
+    /* Predict Section */
+    .predict-section {
+      padding: 100px 0;
+      background: #f8f9fa;
+    }
+    
+    .section-title {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    
+    .section-title h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+    
+    .section-title p {
+      font-size: 1.2rem;
+      color: #6c757d;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .upload-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 3rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .upload-area {
+      border: 3px dashed #e9ecef;
+      border-radius: 15px;
+      padding: 4rem 2rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .upload-area:hover {
+      border-color: #3498db;
+      background-color: #f8f9fa;
+    }
+    
+    .upload-area.dragover {
+      border-color: #28a745;
+      background-color: #d4edda;
+    }
+    
+    .upload-icon {
+      font-size: 4rem;
+      color: #6c757d;
+      margin-bottom: 1.5rem;
+    }
+    
+    .upload-area:hover .upload-icon {
+      color: #3498db;
+    }
+    
+    .file-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .btn-primary-custom {
+      background: #3498db;
+      border: none;
+      color: white;
+      padding: 15px 40px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      margin-top: 2rem;
+    }
+    
+    .btn-primary-custom:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+    }
+    
+    .btn-secondary-custom {
+      background: #6c757d;
+      border: none;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      margin-left: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary-custom:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+    
+    .image-preview {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      margin-top: 2rem;
+    }
+    
+    .result-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    
+    .result-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    .category-biodegradable { color: #28a745; }
+    .category-recyclable { color: #007bff; }
+    .category-trash { color: #dc3545; }
+    
+    /* About Section */
+    .about-section {
+      padding: 100px 0;
+      background: white;
+    }
+    
+    .feature-card {
+      text-align: center;
+      padding: 2rem;
+      height: 100%;
+    }
+    
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      background: #3498db;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1.5rem;
+    }
+    
+    /* Contact Section */
+    .contact-section {
+      padding: 100px 0;
+      background: #2c3e50;
+      color: white;
+    }
+    
+    .contact-info {
+      padding: 2rem;
+    }
+    
+    .contact-item {
+      margin-bottom: 1.5rem;
+    }
+    
+    .contact-item i {
+      color: #3498db;
+      margin-right: 1rem;
+      width: 20px;
+    }
+    
+    .contact-form {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 15px;
+    }
+    
+    .form-control-custom {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: white;
+      padding: 15px;
+      margin-bottom: 1rem;
+    }
+    
+    .form-control-custom::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .form-control-custom:focus {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #3498db;
+      box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+      color: white;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .hero p {
+        font-size: 1.1rem;
+      }
+      
+      .upload-card {
+        padding: 2rem 1rem;
+      }
+      
+      .upload-area {
+        padding: 3rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="#home">MUNICIPAL WASTE CLASSIFICATION</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#home">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#predict">Predict</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#contact">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero">
+  <div class="hero-content">
+    <h1>Municipal Waste Classification</h1>
+    <p>This platform allows you to upload images of waste materials, and our advanced machine learning model will classify them into appropriate categories. Proper waste classification helps in efficient recycling and waste management, making our environment cleaner and more sustainable.</p>
+    <a href="#predict" class="btn-hero">GET STARTED</a>
+  </div>
+</section>
+
+<!-- Predict Section -->
+<section id="predict" class="predict-section">
+  <div class="container">
+    <div class="section-title">
+      <h2>AI Waste Classification</h2>
+      <p>Upload an image of waste material and let our AI classify it for proper disposal</p>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="upload-card">
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="fileInput" class="file-input" accept="image/*">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <h4>Drop your image here or click to browse</h4>
+            <p class="text-muted mb-0">Supports JPG, PNG and other image formats</p>
+          </div>
+          
+          <div>
+            <button class="btn btn-primary-custom" id="predictBtn" disabled>
+              <i class="fas fa-magic me-2"></i>Classify Waste
+            </button>
+            <button class="btn btn-secondary-custom" id="resetBtn" style="display:none;">
+              <i class="fas fa-redo me-2"></i>Reset
+            </button>
+          </div>
+          
+          <div id="imagePreview" style="display:none;">
+            <img id="previewImg" class="image-preview" alt="Preview">
+          </div>
+        </div>
+        
+        <div id="results" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about-section">
+  <div class="container">
+    <div class="section-title">
+      <h2>About Our System</h2>
+      <p>Advanced AI technology for sustainable waste management</p>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h5>AI-Powered Classification</h5>
+          <p>Advanced machine learning algorithms trained on thousands of waste images for accurate categorization into biodegradable, recyclable, and trash categories.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-leaf"></i>
+          </div>
+          <h5>Environmental Impact</h5>
+          <p>Promote sustainable waste management practices and reduce environmental pollution through proper waste classification and disposal.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-recycle"></i>
+          </div>
+          <h5>Recycling Optimization</h5>
+          <p>Maximize recycling efficiency by ensuring waste materials are properly sorted and processed according to their classification.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact-section">
+  <div class="container">
+    <div class="section-title">
+      <h2 style="color: white;">Contact Us</h2>
+      <p style="color: #bdc3c7;">Get in touch for more information about our waste classification system</p>
+    </div>
+    
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="contact-info">
+          <div class="contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <strong>Location:</strong> Andhra Pradesh
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <strong>Email:</strong> indukuribabu.24@gmail.com
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            <strong>Phone:</strong> +91 73822 61689
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <form class="contact-form" id="contactForm">
+          <input class="form-control form-control-custom" type="text" placeholder="Your Name" required>
+          <input class="form-control form-control-custom" type="email" placeholder="Your Email" required>
+          <textarea class="form-control form-control-custom" rows="5" placeholder="Your Message" required></textarea>
+          <button class="btn btn-primary-custom" type="submit">
+            <i class="fas fa-paper-plane me-2"></i>Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// File upload handling
+const fileInput = document.getElementById('fileInput');
+const uploadArea = document.getElementById('uploadArea');
+const predictBtn = document.getElementById('predictBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+// Upload area click handler
+uploadArea.addEventListener('click', () => fileInput.click());
+
+// Drag and drop handlers
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    fileInput.files = files;
+    handleFile();
+  }
+});
+
+// File input change handler
+fileInput.addEventListener('change', handleFile);
+
+function handleFile() {
+  const file = fileInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('previewImg').src = e.target.result;
+      document.getElementById('imagePreview').style.display = 'block';
+      predictBtn.disabled = false;
+      resetBtn.style.display = 'inline-block';
+      
+      // Update upload area
+      uploadArea.innerHTML = `
+        <i class="fas fa-check-circle upload-icon" style="color: #28a745;"></i>
+        <h4 style="color: #28a745;">Image Ready for Classification</h4>
+        <p class="text-muted mb-0">${file.name}</p>
+      `;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// Prediction handler
+predictBtn.addEventListener('click', function() {
+  const file = fileInput.files[0];
+  if (!file) return;
+  
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+  this.disabled = true;
+  
+  fetch('/predict', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.error) {
+      showError(data.error);
+    } else {
+      showResults(data);
+    }
+  })
+  .catch(error => {
+    showError('Network error occurred. Please try again.');
+  })
+  .finally(() => {
+    this.innerHTML = '<i class="fas fa-magic me-2"></i>Classify Waste';
+    this.disabled = false;
+  });
+});
+
+function showResults(data) {
+  const resultsDiv = document.getElementById('results');
+  
+  const categoryInfo = {
+    'biodegradable': {
+      icon: 'fas fa-leaf',
+      color: '#28a745',
+      tip: 'Compost this waste to create nutrient-rich soil for plants!'
+    },
+    'recyclable': {
+      icon: 'fas fa-recycle',
+      color: '#007bff',
+      tip: 'Clean and sort this item for recycling to give it a new life!'
+    },
+    'trash': {
+      icon: 'fas fa-trash',
+      color: '#dc3545',
+      tip: 'Dispose of this item in the general waste bin.'
+    }
+  };
+  
+  const info = categoryInfo[data.prediction] || categoryInfo['trash'];
+  
+  resultsDiv.innerHTML = `
+    <div class="result-card">
+      <i class="${info.icon} result-icon" style="color: ${info.color};"></i>
+      <h3>Classification Result</h3>
+      <h2 style="color: ${info.color}; text-transform: uppercase; margin: 1rem 0;">${data.prediction}</h2>
+      <p class="mb-3">Confidence: <strong>${data.confidence}%</strong></p>
+      
+      <div class="progress mb-4" style="height: 10px;">
+        <div class="progress-bar" style="width: ${data.confidence}%; background-color: ${info.color};"></div>
+      </div>
+      
+      <div class="alert alert-info">
+        <i class="fas fa-lightbulb me-2"></i>
+        <strong>Disposal Tip:</strong> ${info.tip}
+      </div>
+    </div>
+  `;
+  
+  resultsDiv.style.display = 'block';
+}
+
+function showError(message) {
+  document.getElementById('results').innerHTML = `
+    <div class="result-card">
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Error:</strong> ${message}
+      </div>
+    </div>
+  `;
+  document.getElementById('results').style.display = 'block';
+}
+
+// Reset handler
+resetBtn.addEventListener('click', function() {
+  fileInput.value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  this.style.display = 'none';
+  predictBtn.disabled = true;
+  
+  // Reset upload area
+  uploadArea.innerHTML = `
+    <input type="file" id="fileInput" class="file-input" accept="image/*">
+    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+    <h4>Drop your image here or click to browse</h4>
+    <p class="text-muted mb-0">Supports JPG, PNG and other image formats</p>
+  `;
+  
+  // Re-attach event listeners
+  const newFileInput = document.getElementById('fileInput');
+  newFileInput.addEventListener('change', handleFile);
+});
+
+// Contact form handler
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('button');
+  const originalText = btn.innerHTML;
+  
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+  btn.disabled = true;
+  
+  setTimeout(() => {
+    btn.innerHTML = '<i class="fas fa-check me-2"></i>Message Sent!';
+    btn.style.background = '#28a745';
+    
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      btn.style.background = '';
+      this.reset();
+    }, 3000);
+  }, 2000);
+});
+
+// Smooth scrolling
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+});
+
+// Navbar scroll effect
+window.addEventListener('scroll', function() {
+  const navbar = document.querySelector('.navbar');
+  if (window.scrollY > 50) {
+    navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+  } else {
+    navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+  }
+});
+</script>
+
+</body>
+</html>
